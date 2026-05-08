@@ -32,8 +32,19 @@ for (i in seq_len(nrow(out))) {
 expanded <- do.call(rbind, rows)
 
 # Average scores within country-year across simultaneous conflicts
-panel <- aggregate(cbind(revstate, fatality, hostlev) ~ ccode + year,
-                   data = expanded, FUN = mean)
+conflict_cy <- aggregate(cbind(revstate, fatality, hostlev) ~ ccode + year,
+                         data = expanded, FUN = mean)
+
+# Zero-fill: build full grid of every country x every year in the COW universe
+all_ccodes <- sort(unique(out$stabb))
+all_years  <- seq(min(out$styear, na.rm = TRUE), max(out$endyear, na.rm = TRUE))
+full_grid  <- expand.grid(ccode = all_ccodes, year = all_years,
+                          stringsAsFactors = FALSE)
+
+panel <- merge(full_grid, conflict_cy, by = c("ccode", "year"), all.x = TRUE)
+panel$revstate[is.na(panel$revstate)] <- 0
+panel$fatality[is.na(panel$fatality)] <- 0
+panel$hostlev[is.na(panel$hostlev)]   <- 0
 
 panel <- panel[order(panel$ccode, panel$year), ]
 rownames(panel) <- NULL

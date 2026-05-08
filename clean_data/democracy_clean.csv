@@ -1,4 +1,4 @@
-"country_name","country_code","year","v2x_polyarchy","v2x_libdem","v2x_partipdem","v2x_delibdem","v2x_egaldem"
+"country","ccode","year","v2x_polyarchy","v2x_libdem","v2x_partipdem","v2x_delibdem","v2x_egaldem"
 "afghanistan","afg",1789,0.019,0.029,0.018,NA,NA
 "afghanistan","afg",1790,0.019,0.029,0.022,NA,NA
 "afghanistan","afg",1791,0.019,0.029,0.022,NA,NA

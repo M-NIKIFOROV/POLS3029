@@ -14,8 +14,9 @@ raw <- raw[raw[["OBS_MEASURE"]] == "OBS_VALUE", ]
 year_cols <- grep("^[0-9]{4}$", names(raw), value = TRUE)
 
 wide <- data.frame(
-  country_name = tolower(raw[["COUNTRY"]]),
-  country_code = tolower(sub("\\..*$", "", raw[["SERIES_CODE"]])),
+  country = tolower(raw[["COUNTRY"]]),
+  ccode = tolower(sub("\\..*$", "", raw[["SERIES_CODE"]])),
+
   sector       = tolower(raw[["SECTOR"]]),
   raw[, year_cols],
   stringsAsFactors = FALSE,
@@ -24,7 +25,7 @@ wide <- data.frame(
 
 names(wide)[-(1:3)] <- as.integer(year_cols)
 
-wide <- wide[order(wide$country_name, wide$sector), ]
+wide <- wide[order(wide$country, wide$sector), ]
 rownames(wide) <- NULL
 
 write.csv(wide, "clean_data/vfi_clean.csv", row.names = FALSE)

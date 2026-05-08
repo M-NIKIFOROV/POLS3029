@@ -27,16 +27,16 @@ year_cols <- grep("^[0-9]{4}$", names(raw), value = TRUE)
 raw <- raw[raw[["OBS_MEASURE"]] == "OBS_VALUE", ]
 
 wide <- raw[c("COUNTRY", "SERIES_CODE", year_cols)]
-names(wide)[1:2] <- c("country_name", "country_code")
+names(wide)[1:2] <- c("country", "ccode")
 
-wide$country_name <- tolower(wide$country_name)
-wide$country_code <- tolower(sub("\\..*$", "", wide$country_code))
+wide$country <- tolower(wide$country)
+wide$ccode <- tolower(sub("\\..*$", "", wide$ccode))
 
 for (col in year_cols) {
   wide[[col]] <- as.numeric(wide[[col]])
 }
 
-wide <- wide[order(wide$country_code), ]
+wide <- wide[order(wide$ccode), ]
 
 write.csv(wide, output_path, row.names = FALSE, quote = TRUE)
 
