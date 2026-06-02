@@ -1,0 +1,109 @@
+================================================================================
+GVIF DIAGNOSTIC RESULTS (CRE-MUNDLAK 2x2)
+Metric reported: GVIF, Df, and adjusted GVIF = GVIF^(1/(2*Df))
+Interpretation focus should be on adjusted GVIF values
+================================================================================
+
+MODEL 1
+--------------------------------------------------------------------------------
+Conflict: fatalities_continuous (Fatalities intensity (continuous F))
+Outcome : vfi_fiscal (Fiscal centralisation (VFI))
+Formula : y_val ~ conflict_w + conflict_w:Fed + logG + logP + dem + conflict_mean +      conflict_mean_Fed + logG_mean + logP_mean + dem_mean + year_f
+N=736 | Countries=57
+
+Term                                          GVIF         Df       GVIF_adj
+--------------------------------------------------------------------------------
+conflict_w                                  1.6234          1         1.2741
+logG                                      155.9587          1        12.4883
+logP                                     1188.1530          1        34.4696
+dem                                        20.5570          1         4.5340
+conflict_mean                               1.5595          1         1.2488
+conflict_mean_Fed                           1.5775          1         1.2560
+logG_mean                                 157.1526          1        12.5361
+logP_mean                                1189.5259          1        34.4895
+dem_mean                                   22.0787          1         4.6988
+year_f                                      3.3881         24         1.0257
+conflict_w:Fed                              1.4782          1         1.2158
+
+Key terms (adjusted GVIF):
+  conflict_w = 1.2741
+  conflict_w:Fed = 1.2158
+
+MODEL 2
+--------------------------------------------------------------------------------
+Conflict: hostility_high_dummy (High hostility dummy (HL >= 4))
+Outcome : vfi_fiscal (Fiscal centralisation (VFI))
+Formula : y_val ~ conflict_w + conflict_w:Fed + logG + logP + dem + conflict_mean +      conflict_mean_Fed + logG_mean + logP_mean + dem_mean + year_f
+N=736 | Countries=57
+
+Term                                          GVIF         Df       GVIF_adj
+--------------------------------------------------------------------------------
+conflict_w                                  1.9310          1         1.3896
+logG                                      154.8104          1        12.4423
+logP                                     1181.2780          1        34.3697
+dem                                        20.6056          1         4.5393
+conflict_mean                               1.6770          1         1.2950
+conflict_mean_Fed                           1.7410          1         1.3195
+logG_mean                                 155.2221          1        12.4588
+logP_mean                                1181.2950          1        34.3700
+dem_mean                                   22.1721          1         4.7087
+year_f                                      3.8806         24         1.0287
+conflict_w:Fed                              1.8109          1         1.3457
+
+Key terms (adjusted GVIF):
+  conflict_w = 1.3896
+  conflict_w:Fed = 1.3457
+
+MODEL 3
+--------------------------------------------------------------------------------
+Conflict: fatalities_continuous (Fatalities intensity (continuous F))
+Outcome : selfrule_institutional (Institutional centralisation (reverse-coded self-rule))
+Formula : y_val ~ conflict_w + conflict_w:Fed + logG + logP + dem + conflict_mean +      conflict_mean_Fed + logG_mean + logP_mean + dem_mean + year_f
+N=2141 | Countries=88
+
+Term                                          GVIF         Df       GVIF_adj
+--------------------------------------------------------------------------------
+conflict_w                                  4.5133          1         2.1245
+logG                                       88.0271          1         9.3823
+logP                                      738.2297          1        27.1704
+dem                                        11.5308          1         3.3957
+conflict_mean                               5.0060          1         2.2374
+conflict_mean_Fed                           5.4949          1         2.3441
+logG_mean                                  88.2291          1         9.3930
+logP_mean                                 738.4111          1        27.1737
+dem_mean                                   13.1811          1         3.6306
+year_f                                      4.5825         24         1.0322
+conflict_w:Fed                              4.8024          1         2.1914
+
+Key terms (adjusted GVIF):
+  conflict_w = 2.1245
+  conflict_w:Fed = 2.1914
+
+MODEL 4
+--------------------------------------------------------------------------------
+Conflict: hostility_high_dummy (High hostility dummy (HL >= 4))
+Outcome : selfrule_institutional (Institutional centralisation (reverse-coded self-rule))
+Formula : y_val ~ conflict_w + conflict_w:Fed + logG + logP + dem + conflict_mean +      conflict_mean_Fed + logG_mean + logP_mean + dem_mean + year_f
+N=2141 | Countries=88
+
+Term                                          GVIF         Df       GVIF_adj
+--------------------------------------------------------------------------------
+conflict_w                                  1.6803          1         1.2963
+logG                                       88.1577          1         9.3892
+logP                                      728.6442          1        26.9934
+dem                                        11.4647          1         3.3860
+conflict_mean                               1.8936          1         1.3761
+conflict_mean_Fed                           2.1951          1         1.4816
+logG_mean                                  88.2301          1         9.3931
+logP_mean                                 728.8874          1        26.9979
+dem_mean                                   13.1455          1         3.6257
+year_f                                      4.6425         24         1.0325
+conflict_w:Fed                              1.9974          1         1.4133
+
+Key terms (adjusted GVIF):
+  conflict_w = 1.2963
+  conflict_w:Fed = 1.4133
+
+GUIDE: adjusted GVIF around <5 often acceptable; >10 often concerning.
+
+DIAGNOSTICS COMPLETE.

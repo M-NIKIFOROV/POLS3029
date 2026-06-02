@@ -1,6 +1,6 @@
-# 02_regression/02_regression.R
-# Run 2x2 baseline CRE-Mundlak model matrix from model_config.R
-# Output: 02_regression/02_output/02_regression.txt
+# Run sample-restriction robustness models from model_config.R
+# Restriction: common-support sample across all model matrix variables
+# Output: 03_robustness/05_sample/05_sample_output/05_sample.txt
 
 setwd("c:/Users/maxim/OneDrive/Documents/University - Year 3/POLS3029/paper/POLS3029")
 
@@ -15,11 +15,21 @@ source("model_config.R")
 
 panel_path <- "clean_data/model_panel_clean.csv"
 if (!file.exists(panel_path)) {
-  stop("Missing clean_data/model_panel_clean.csv. Run 02_regression/01_build_panel.R first.")
+  stop("Missing clean_data/model_panel_clean.csv. Run 01_cleaning/01_build_panel.R first.")
 }
 
 panel <- read.csv(panel_path, stringsAsFactors = FALSE)
 panel$year_f <- as.factor(panel$year)
+
+# One sample robustness: common-support rows used across all 2x2 models.
+common_vars <- c(
+  "F", "HL", "vfi", "SELF",
+  MODEL_CONFIG$controls,
+  MODEL_CONFIG$federal_indicator,
+  "year", "year_f", "ccode"
+)
+common_vars <- unique(common_vars[common_vars %in% names(panel)])
+panel_restricted <- panel[complete.cases(panel[, common_vars, drop = FALSE]), ]
 
 # ----------------------------------------------------------------------------
 # Helpers
@@ -84,12 +94,9 @@ fit_one_model <- function(data, conflict_key, centralisation_key, cfg = MODEL_CO
   vc <- vcovCL(m, cluster = dat$ccode)
   ct <- coeftest(m, vcov. = vc)
 
-  # Track terms expected by the formula but omitted from estimation output
-  # (typically due to singularity / no in-sample variation).
   mm_terms <- colnames(model.matrix(m))
   omitted_terms <- setdiff(mm_terms, rownames(ct))
 
-  # Keep CRE and Mundlak coefficients but drop year FE dummies for readability
   keep <- !grepl("^year_f", rownames(ct))
   ct <- ct[keep, , drop = FALSE]
 
@@ -119,34 +126,39 @@ fit_one_model <- function(data, conflict_key, centralisation_key, cfg = MODEL_CO
 }
 
 # ----------------------------------------------------------------------------
-# Run model matrix
+# Run model matrix on full and restricted samples
 # ----------------------------------------------------------------------------
 
 results <- list()
-for (i in seq_along(MODEL_CONFIG$model_matrix)) {
-  spec <- MODEL_CONFIG$model_matrix[[i]]
-  key <- paste(spec$conflict, spec$centralisation, sep = "__")
-  results[[key]] <- fit_one_model(
-    data = panel,
-    conflict_key = spec$conflict,
-    centralisation_key = spec$centralisation,
-    cfg = MODEL_CONFIG
-  )
+for (sample_name in c("full", "restricted_common_support")) {
+  panel_use <- if (sample_name == "full") panel else panel_restricted
+
+  for (i in seq_along(MODEL_CONFIG$model_matrix)) {
+    spec <- MODEL_CONFIG$model_matrix[[i]]
+    key <- paste(sample_name, spec$conflict, spec$centralisation, sep = "__")
+    results[[key]] <- fit_one_model(
+      data = panel_use,
+      conflict_key = spec$conflict,
+      centralisation_key = spec$centralisation,
+      cfg = MODEL_CONFIG
+    )
+  }
 }
 
 # ----------------------------------------------------------------------------
 # Write output
 # ----------------------------------------------------------------------------
 
-dir.create("02_regression/02_output", recursive = TRUE, showWarnings = FALSE)
-out_file <- "02_regression/02_output/02_regression.txt"
+dir.create("03_robustness/05_sample/05_sample_output", recursive = TRUE, showWarnings = FALSE)
+out_file <- "03_robustness/05_sample/05_sample_output/05_sample.txt"
 
 sink(out_file)
 
 cat("================================================================================\n")
-cat("CRE-MUNDLAK 2x2 MODEL MATRIX RESULTS\n")
-cat(sprintf("Conflict indicators: %s\n", paste(unique(vapply(MODEL_CONFIG$model_matrix, function(x) x$conflict, character(1))), collapse = ", ")))
-cat(sprintf("Centralisation outcomes: %s\n", paste(unique(vapply(MODEL_CONFIG$model_matrix, function(x) x$centralisation, character(1))), collapse = ", ")))
+cat("SAMPLE ROBUSTNESS RESULTS (CRE-MUNDLAK 2x2)\n")
+cat("Restriction: common-support sample with complete data on all model variables (restricted_common_support)\n")
+cat(sprintf("Panel countries: full=%d, restricted=%d\n", length(unique(panel$ccode)), length(unique(panel_restricted$ccode))))
+cat(sprintf("Panel rows     : full=%d, restricted=%d\n", nrow(panel), nrow(panel_restricted)))
 cat("Specification: Y_it = Conflict_it + Conflict_it x Fed_i + controls_it + country means (Mundlak) + year FE\n")
 cat("SE: Country-clustered (vcovCL)\n")
 cat("Reporting: year FE coefficients omitted for readability\n")
@@ -156,11 +168,15 @@ model_names <- names(results)
 for (i in seq_along(model_names)) {
   r <- results[[model_names[i]]]
 
+  model_id <- strsplit(model_names[i], "__", fixed = TRUE)[[1]]
+  sample_name <- model_id[1]
+
   cat(sprintf("MODEL %d\n", i))
   cat("--------------------------------------------------------------------------------\n")
-  cat(sprintf("Conflict: %s (%s)\n", r$conflict_key, r$conflict_label))
-  cat(sprintf("Outcome : %s (%s)\n", r$centralisation_key, r$centralisation_label))
-  cat(sprintf("Formula : %s\n", paste(r$formula, collapse = " ")))
+  cat(sprintf("Sample   : %s\n", sample_name))
+  cat(sprintf("Conflict : %s (%s)\n", r$conflict_key, r$conflict_label))
+  cat(sprintf("Outcome  : %s (%s)\n", r$centralisation_key, r$centralisation_label))
+  cat(sprintf("Formula  : %s\n", paste(r$formula, collapse = " ")))
   cat(sprintf("N=%d | Countries=%d | R2=%.4f | Adj.R2=%.4f\n", r$n, r$countries, r$r2, r$adj_r2))
   cat("\n")
 

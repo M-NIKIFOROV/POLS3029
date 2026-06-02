@@ -1,6 +1,5 @@
-# 02_regression/02_regression.R
-# Run 2x2 baseline CRE-Mundlak model matrix from model_config.R
-# Output: 02_regression/02_output/02_regression.txt
+# Run control-set robustness models from model_config.R
+# Output: 03_robustness/04_control_set/04_control_set_output/04_control_set.txt
 
 setwd("c:/Users/maxim/OneDrive/Documents/University - Year 3/POLS3029/paper/POLS3029")
 
@@ -15,11 +14,19 @@ source("model_config.R")
 
 panel_path <- "clean_data/model_panel_clean.csv"
 if (!file.exists(panel_path)) {
-  stop("Missing clean_data/model_panel_clean.csv. Run 02_regression/01_build_panel.R first.")
+  stop("Missing clean_data/model_panel_clean.csv. Run 01_cleaning/01_build_panel.R first.")
 }
 
 panel <- read.csv(panel_path, stringsAsFactors = FALSE)
 panel$year_f <- as.factor(panel$year)
+
+# Control-set design: with/without democracy, with/without GDPpc (logG).
+control_sets <- list(
+  full_logG_dem = c("logG", "logP", "dem"),
+  no_dem = c("logG", "logP"),
+  no_logG = c("logP", "dem"),
+  no_logG_no_dem = c("logP")
+)
 
 # ----------------------------------------------------------------------------
 # Helpers
@@ -44,13 +51,13 @@ add_control_means <- function(dat, controls) {
   list(dat = dat, mean_vars = mean_vars)
 }
 
-fit_one_model <- function(data, conflict_key, centralisation_key, cfg = MODEL_CONFIG) {
+fit_one_model <- function(data, conflict_key, centralisation_key, controls, cfg = MODEL_CONFIG) {
   conflict_expr <- get_conflict_term_by_key(conflict_key, cfg)
   outcome_expr <- get_outcome_term_by_key(centralisation_key, cfg)
   conflict_src <- cfg$conflict[[conflict_key]]$source_variable
   outcome_src <- cfg$centralisation[[centralisation_key]]$source_variable
 
-  vars_needed <- c(conflict_src, outcome_src, cfg$controls, cfg$federal_indicator, "year_f", "ccode")
+  vars_needed <- c(conflict_src, outcome_src, controls, cfg$federal_indicator, "year_f", "ccode")
   vars_needed <- vars_needed[vars_needed %in% names(data)]
 
   dat <- data[complete.cases(data[, vars_needed, drop = FALSE]), ]
@@ -64,14 +71,14 @@ fit_one_model <- function(data, conflict_key, centralisation_key, cfg = MODEL_CO
   dat$conflict_mean <- ave(dat$conflict_w, dat$ccode, FUN = function(x) mean(x, na.rm = TRUE))
   dat$conflict_mean_Fed <- dat$conflict_mean * dat[[cfg$federal_indicator]]
 
-  mean_build <- add_control_means(dat, cfg$controls)
+  mean_build <- add_control_means(dat, controls)
   dat <- mean_build$dat
   control_mean_terms <- mean_build$mean_vars
 
   rhs <- c(
     "conflict_w",
     sprintf("conflict_w:%s", cfg$federal_indicator),
-    cfg$controls,
+    controls,
     "conflict_mean",
     "conflict_mean_Fed",
     control_mean_terms,
@@ -84,12 +91,9 @@ fit_one_model <- function(data, conflict_key, centralisation_key, cfg = MODEL_CO
   vc <- vcovCL(m, cluster = dat$ccode)
   ct <- coeftest(m, vcov. = vc)
 
-  # Track terms expected by the formula but omitted from estimation output
-  # (typically due to singularity / no in-sample variation).
   mm_terms <- colnames(model.matrix(m))
   omitted_terms <- setdiff(mm_terms, rownames(ct))
 
-  # Keep CRE and Mundlak coefficients but drop year FE dummies for readability
   keep <- !grepl("^year_f", rownames(ct))
   ct <- ct[keep, , drop = FALSE]
 
@@ -108,6 +112,7 @@ fit_one_model <- function(data, conflict_key, centralisation_key, cfg = MODEL_CO
     conflict_label = cfg$conflict[[conflict_key]]$label,
     centralisation_key = centralisation_key,
     centralisation_label = cfg$centralisation[[centralisation_key]]$label,
+    controls = controls,
     formula = deparse(f),
     n = nrow(dat),
     countries = length(unique(dat$ccode)),
@@ -119,34 +124,37 @@ fit_one_model <- function(data, conflict_key, centralisation_key, cfg = MODEL_CO
 }
 
 # ----------------------------------------------------------------------------
-# Run model matrix
+# Run model matrix across control sets
 # ----------------------------------------------------------------------------
 
 results <- list()
-for (i in seq_along(MODEL_CONFIG$model_matrix)) {
-  spec <- MODEL_CONFIG$model_matrix[[i]]
-  key <- paste(spec$conflict, spec$centralisation, sep = "__")
-  results[[key]] <- fit_one_model(
-    data = panel,
-    conflict_key = spec$conflict,
-    centralisation_key = spec$centralisation,
-    cfg = MODEL_CONFIG
-  )
+for (set_name in names(control_sets)) {
+  controls_here <- control_sets[[set_name]]
+  for (i in seq_along(MODEL_CONFIG$model_matrix)) {
+    spec <- MODEL_CONFIG$model_matrix[[i]]
+    key <- paste(set_name, spec$conflict, spec$centralisation, sep = "__")
+    results[[key]] <- fit_one_model(
+      data = panel,
+      conflict_key = spec$conflict,
+      centralisation_key = spec$centralisation,
+      controls = controls_here,
+      cfg = MODEL_CONFIG
+    )
+  }
 }
 
 # ----------------------------------------------------------------------------
 # Write output
 # ----------------------------------------------------------------------------
 
-dir.create("02_regression/02_output", recursive = TRUE, showWarnings = FALSE)
-out_file <- "02_regression/02_output/02_regression.txt"
+dir.create("03_robustness/04_control_set/04_control_set_output", recursive = TRUE, showWarnings = FALSE)
+out_file <- "03_robustness/04_control_set/04_control_set_output/04_control_set.txt"
 
 sink(out_file)
 
 cat("================================================================================\n")
-cat("CRE-MUNDLAK 2x2 MODEL MATRIX RESULTS\n")
-cat(sprintf("Conflict indicators: %s\n", paste(unique(vapply(MODEL_CONFIG$model_matrix, function(x) x$conflict, character(1))), collapse = ", ")))
-cat(sprintf("Centralisation outcomes: %s\n", paste(unique(vapply(MODEL_CONFIG$model_matrix, function(x) x$centralisation, character(1))), collapse = ", ")))
+cat("CONTROL-SET ROBUSTNESS RESULTS (CRE-MUNDLAK 2x2)\n")
+cat("Control sets: full_logG_dem, no_dem, no_logG, no_logG_no_dem\n")
 cat("Specification: Y_it = Conflict_it + Conflict_it x Fed_i + controls_it + country means (Mundlak) + year FE\n")
 cat("SE: Country-clustered (vcovCL)\n")
 cat("Reporting: year FE coefficients omitted for readability\n")
@@ -156,11 +164,15 @@ model_names <- names(results)
 for (i in seq_along(model_names)) {
   r <- results[[model_names[i]]]
 
+  model_id <- strsplit(model_names[i], "__", fixed = TRUE)[[1]]
+  set_name <- model_id[1]
+
   cat(sprintf("MODEL %d\n", i))
   cat("--------------------------------------------------------------------------------\n")
-  cat(sprintf("Conflict: %s (%s)\n", r$conflict_key, r$conflict_label))
-  cat(sprintf("Outcome : %s (%s)\n", r$centralisation_key, r$centralisation_label))
-  cat(sprintf("Formula : %s\n", paste(r$formula, collapse = " ")))
+  cat(sprintf("Control set: %s | controls = %s\n", set_name, paste(r$controls, collapse = ", ")))
+  cat(sprintf("Conflict   : %s (%s)\n", r$conflict_key, r$conflict_label))
+  cat(sprintf("Outcome    : %s (%s)\n", r$centralisation_key, r$centralisation_label))
+  cat(sprintf("Formula    : %s\n", paste(r$formula, collapse = " ")))
   cat(sprintf("N=%d | Countries=%d | R2=%.4f | Adj.R2=%.4f\n", r$n, r$countries, r$r2, r$adj_r2))
   cat("\n")
 

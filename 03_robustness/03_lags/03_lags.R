@@ -50,6 +50,16 @@ sig_mark <- function(p) {
   ""
 }
 
+add_control_means <- function(dat, controls) {
+  mean_vars <- character(0)
+  for (ctrl in controls) {
+    mean_col <- paste0(ctrl, "_mean")
+    dat[[mean_col]] <- ave(dat[[ctrl]], dat$ccode, FUN = function(x) mean(x, na.rm = TRUE))
+    mean_vars <- c(mean_vars, mean_col)
+  }
+  list(dat = dat, mean_vars = mean_vars)
+}
+
 build_lagged_conflict_term <- function(conflict_key, lag_k, cfg = MODEL_CONFIG) {
   spec <- cfg$conflict[[conflict_key]]
   src <- spec$source_variable
@@ -76,17 +86,23 @@ fit_one_lag_model <- function(data, conflict_key, centralisation_key, lag_k, cfg
   dat$conflict_w <- with(dat, eval(parse(text = conflict_expr)))
 
   dat$conflict_mean <- ave(dat$conflict_w, dat$ccode, FUN = function(x) mean(x, na.rm = TRUE))
-  dat$logG_mean <- ave(dat$logG, dat$ccode, FUN = function(x) mean(x, na.rm = TRUE))
-  dat$logP_mean <- ave(dat$logP, dat$ccode, FUN = function(x) mean(x, na.rm = TRUE))
   dat$conflict_mean_Fed <- dat$conflict_mean * dat[[fed]]
 
-  f <- as.formula(
-    paste(
-      "y_val ~ conflict_w + conflict_w:", fed,
-      "+ logG + logP + conflict_mean + conflict_mean_Fed + logG_mean + logP_mean + year_f",
-      sep = ""
-    )
+  mean_build <- add_control_means(dat, cfg$controls)
+  dat <- mean_build$dat
+  control_mean_terms <- mean_build$mean_vars
+
+  rhs <- c(
+    "conflict_w",
+    sprintf("conflict_w:%s", fed),
+    cfg$controls,
+    "conflict_mean",
+    "conflict_mean_Fed",
+    control_mean_terms,
+    "year_f"
   )
+
+  f <- as.formula(sprintf("y_val ~ %s", paste(rhs, collapse = " + ")))
 
   m <- lm(f, data = dat)
   vc <- vcovCL(m, cluster = dat$ccode)
@@ -157,7 +173,7 @@ cat("LAG ROBUSTNESS CRE-MUNDLAK MODEL RESULTS\n")
 cat(sprintf("Conflict indicators: %s\n", paste(unique(vapply(MODEL_CONFIG$model_matrix, function(x) x$conflict, character(1))), collapse = ", ")))
 cat(sprintf("Centralisation outcomes: %s\n", paste(unique(vapply(MODEL_CONFIG$model_matrix, function(x) x$centralisation, character(1))), collapse = ", ")))
 cat("Lags estimated: 1, 2, 3 years\n")
-cat("Specification: Y_it = Conflict_i,t-k + Conflict_i,t-k x Fed_i + logG_it + logP_it + country means (Mundlak) + year FE\n")
+cat("Specification: Y_it = Conflict_i,t-k + Conflict_i,t-k x Fed_i + controls_it + country means (Mundlak) + year FE\n")
 cat("SE: Country-clustered (vcovCL)\n")
 cat("Reporting: year FE coefficients omitted for readability\n")
 cat("================================================================================\n\n")

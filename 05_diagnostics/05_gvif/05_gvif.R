@@ -1,11 +1,9 @@
-# 02_regression/02_regression.R
-# Run 2x2 baseline CRE-Mundlak model matrix from model_config.R
-# Output: 02_regression/02_output/02_regression.txt
+# Compute GVIF diagnostics for baseline CRE-Mundlak model matrix
+# Output: 05_diagnostics/05_gvif/05_gvif_output/05_gvif.txt
 
 setwd("c:/Users/maxim/OneDrive/Documents/University - Year 3/POLS3029/paper/POLS3029")
 
-library(sandwich)
-library(lmtest)
+library(car)
 
 source("model_config.R")
 
@@ -15,7 +13,7 @@ source("model_config.R")
 
 panel_path <- "clean_data/model_panel_clean.csv"
 if (!file.exists(panel_path)) {
-  stop("Missing clean_data/model_panel_clean.csv. Run 02_regression/01_build_panel.R first.")
+  stop("Missing clean_data/model_panel_clean.csv. Run 01_cleaning/01_build_panel.R first.")
 }
 
 panel <- read.csv(panel_path, stringsAsFactors = FALSE)
@@ -24,15 +22,6 @@ panel$year_f <- as.factor(panel$year)
 # ----------------------------------------------------------------------------
 # Helpers
 # ----------------------------------------------------------------------------
-
-sig_mark <- function(p) {
-  if (is.na(p)) return("")
-  if (p < 0.001) return("***")
-  if (p < 0.01) return("**")
-  if (p < 0.05) return("*")
-  if (p < 0.10) return(".")
-  ""
-}
 
 add_control_means <- function(dat, controls) {
   mean_vars <- character(0)
@@ -44,7 +33,7 @@ add_control_means <- function(dat, controls) {
   list(dat = dat, mean_vars = mean_vars)
 }
 
-fit_one_model <- function(data, conflict_key, centralisation_key, cfg = MODEL_CONFIG) {
+fit_one_model_for_gvif <- function(data, conflict_key, centralisation_key, cfg = MODEL_CONFIG) {
   conflict_expr <- get_conflict_term_by_key(conflict_key, cfg)
   outcome_expr <- get_outcome_term_by_key(centralisation_key, cfg)
   conflict_src <- cfg$conflict[[conflict_key]]$source_variable
@@ -79,29 +68,28 @@ fit_one_model <- function(data, conflict_key, centralisation_key, cfg = MODEL_CO
   )
 
   f <- as.formula(sprintf("y_val ~ %s", paste(rhs, collapse = " + ")))
-
   m <- lm(f, data = dat)
-  vc <- vcovCL(m, cluster = dat$ccode)
-  ct <- coeftest(m, vcov. = vc)
 
-  # Track terms expected by the formula but omitted from estimation output
-  # (typically due to singularity / no in-sample variation).
-  mm_terms <- colnames(model.matrix(m))
-  omitted_terms <- setdiff(mm_terms, rownames(ct))
+  v <- suppressWarnings(vif(m))
 
-  # Keep CRE and Mundlak coefficients but drop year FE dummies for readability
-  keep <- !grepl("^year_f", rownames(ct))
-  ct <- ct[keep, , drop = FALSE]
-
-  coefs <- data.frame(
-    term = rownames(ct),
-    estimate = as.numeric(ct[, 1]),
-    std_error = as.numeric(ct[, 2]),
-    t_value = as.numeric(ct[, 3]),
-    p_value = as.numeric(ct[, 4]),
-    stringsAsFactors = FALSE
-  )
-  rownames(coefs) <- NULL
+  if (is.vector(v)) {
+    vif_tab <- data.frame(
+      term = names(v),
+      gvif = as.numeric(v),
+      df = 1,
+      gvif_adj = as.numeric(v),
+      stringsAsFactors = FALSE
+    )
+  } else {
+    vif_tab <- data.frame(
+      term = rownames(v),
+      gvif = as.numeric(v[, "GVIF"]),
+      df = as.numeric(v[, "Df"]),
+      gvif_adj = as.numeric(v[, "GVIF^(1/(2*Df))"]),
+      stringsAsFactors = FALSE
+    )
+  }
+  rownames(vif_tab) <- NULL
 
   list(
     conflict_key = conflict_key,
@@ -111,10 +99,7 @@ fit_one_model <- function(data, conflict_key, centralisation_key, cfg = MODEL_CO
     formula = deparse(f),
     n = nrow(dat),
     countries = length(unique(dat$ccode)),
-    r2 = summary(m)$r.squared,
-    adj_r2 = summary(m)$adj.r.squared,
-    omitted_terms = omitted_terms,
-    coefs = coefs
+    vif_tab = vif_tab
   )
 }
 
@@ -126,7 +111,7 @@ results <- list()
 for (i in seq_along(MODEL_CONFIG$model_matrix)) {
   spec <- MODEL_CONFIG$model_matrix[[i]]
   key <- paste(spec$conflict, spec$centralisation, sep = "__")
-  results[[key]] <- fit_one_model(
+  results[[key]] <- fit_one_model_for_gvif(
     data = panel,
     conflict_key = spec$conflict,
     centralisation_key = spec$centralisation,
@@ -138,54 +123,49 @@ for (i in seq_along(MODEL_CONFIG$model_matrix)) {
 # Write output
 # ----------------------------------------------------------------------------
 
-dir.create("02_regression/02_output", recursive = TRUE, showWarnings = FALSE)
-out_file <- "02_regression/02_output/02_regression.txt"
+dir.create("05_diagnostics/05_gvif/05_gvif_output", recursive = TRUE, showWarnings = FALSE)
+out_file <- "05_diagnostics/05_gvif/05_gvif_output/05_gvif.txt"
 
 sink(out_file)
 
 cat("================================================================================\n")
-cat("CRE-MUNDLAK 2x2 MODEL MATRIX RESULTS\n")
-cat(sprintf("Conflict indicators: %s\n", paste(unique(vapply(MODEL_CONFIG$model_matrix, function(x) x$conflict, character(1))), collapse = ", ")))
-cat(sprintf("Centralisation outcomes: %s\n", paste(unique(vapply(MODEL_CONFIG$model_matrix, function(x) x$centralisation, character(1))), collapse = ", ")))
-cat("Specification: Y_it = Conflict_it + Conflict_it x Fed_i + controls_it + country means (Mundlak) + year FE\n")
-cat("SE: Country-clustered (vcovCL)\n")
-cat("Reporting: year FE coefficients omitted for readability\n")
+cat("GVIF DIAGNOSTIC RESULTS (CRE-MUNDLAK 2x2)\n")
+cat("Metric reported: GVIF, Df, and adjusted GVIF = GVIF^(1/(2*Df))\n")
+cat("Interpretation focus should be on adjusted GVIF values\n")
 cat("================================================================================\n\n")
 
-model_names <- names(results)
-for (i in seq_along(model_names)) {
-  r <- results[[model_names[i]]]
+for (i in seq_along(results)) {
+  r <- results[[i]]
 
   cat(sprintf("MODEL %d\n", i))
   cat("--------------------------------------------------------------------------------\n")
   cat(sprintf("Conflict: %s (%s)\n", r$conflict_key, r$conflict_label))
   cat(sprintf("Outcome : %s (%s)\n", r$centralisation_key, r$centralisation_label))
   cat(sprintf("Formula : %s\n", paste(r$formula, collapse = " ")))
-  cat(sprintf("N=%d | Countries=%d | R2=%.4f | Adj.R2=%.4f\n", r$n, r$countries, r$r2, r$adj_r2))
+  cat(sprintf("N=%d | Countries=%d\n", r$n, r$countries))
   cat("\n")
 
-  cat(sprintf("%-35s %14s %14s %12s %12s\n", "Term", "Coef", "SE", "t", "p"))
-  cat(paste(rep("-", 95), collapse = ""), "\n", sep = "")
+  cat(sprintf("%-35s %14s %10s %14s\n", "Term", "GVIF", "Df", "GVIF_adj"))
+  cat(paste(rep("-", 80), collapse = ""), "\n", sep = "")
 
-  for (j in seq_len(nrow(r$coefs))) {
-    rr <- r$coefs[j, ]
-    est <- sprintf("%.6f%s", rr$estimate, sig_mark(rr$p_value))
-    se <- sprintf("(%.6f)", rr$std_error)
-    tval <- sprintf("%.3f", rr$t_value)
-    pval <- sprintf("%.5f", rr$p_value)
-    cat(sprintf("%-35s %14s %14s %12s %12s\n", rr$term, est, se, tval, pval))
+  for (j in seq_len(nrow(r$vif_tab))) {
+    rr <- r$vif_tab[j, ]
+    cat(sprintf("%-35s %14.4f %10.0f %14.4f\n", rr$term, rr$gvif, rr$df, rr$gvif_adj))
   }
 
-  dropped_non_fe <- r$omitted_terms[!grepl("^year_f", r$omitted_terms)]
-  if (length(dropped_non_fe) > 0) {
-    cat("\nDropped (not estimable in-sample): ", paste(dropped_non_fe, collapse = ", "), "\n", sep = "")
+  key_terms <- r$vif_tab[r$vif_tab$term %in% c("conflict_w", "conflict_w:Fed"), , drop = FALSE]
+  if (nrow(key_terms) > 0) {
+    cat("\nKey terms (adjusted GVIF):\n")
+    for (k in seq_len(nrow(key_terms))) {
+      cat(sprintf("  %s = %.4f\n", key_terms$term[k], key_terms$gvif_adj[k]))
+    }
   }
 
   cat("\n")
 }
 
-cat("Significance: *** p<0.001, ** p<0.01, * p<0.05, . p<0.10\n")
-cat("\nESTIMATION COMPLETE.\n")
+cat("GUIDE: adjusted GVIF around <5 often acceptable; >10 often concerning.\n")
+cat("\nDIAGNOSTICS COMPLETE.\n")
 
 sink()
 

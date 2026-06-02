@@ -1,0 +1,331 @@
+================================================================================
+CONTROL-SET ROBUSTNESS RESULTS (CRE-MUNDLAK 2x2)
+Control sets: full_logG_dem, no_dem, no_logG, no_logG_no_dem
+Specification: Y_it = Conflict_it + Conflict_it x Fed_i + controls_it + country means (Mundlak) + year FE
+SE: Country-clustered (vcovCL)
+Reporting: year FE coefficients omitted for readability
+================================================================================
+
+MODEL 1
+--------------------------------------------------------------------------------
+Control set: full_logG_dem | controls = logG, logP, dem
+Conflict   : fatalities_continuous (Fatalities intensity (continuous F))
+Outcome    : vfi_fiscal (Fiscal centralisation (VFI))
+Formula    : y_val ~ conflict_w + conflict_w:Fed + logG + logP + dem + conflict_mean +      conflict_mean_Fed + logG_mean + logP_mean + dem_mean + year_f
+N=736 | Countries=57 | R2=0.1206 | Adj.R2=0.0779
+
+Term                                          Coef             SE            t            p
+-----------------------------------------------------------------------------------------------
+(Intercept)                               0.357096     (0.581495)        0.614      0.53935
+conflict_w                                0.009704     (0.017306)        0.561      0.57514
+logG                                      0.078936     (0.211991)        0.372      0.70974
+logP                                     -0.376768     (0.406711)       -0.926      0.35457
+dem                                       0.208389     (0.170324)        1.223      0.22156
+conflict_mean                             0.138319     (0.166918)        0.829      0.40757
+conflict_mean_Fed                       -0.761231.     (0.453178)       -1.680      0.09345
+logG_mean                                -0.161287     (0.229209)       -0.704      0.48187
+logP_mean                                 0.394786     (0.413946)        0.954      0.34056
+dem_mean                                  0.154452     (0.283266)        0.545      0.58575
+conflict_w:Fed                           -0.008770     (0.039149)       -0.224      0.82280
+
+MODEL 2
+--------------------------------------------------------------------------------
+Control set: full_logG_dem | controls = logG, logP, dem
+Conflict   : hostility_high_dummy (High hostility dummy (HL >= 4))
+Outcome    : vfi_fiscal (Fiscal centralisation (VFI))
+Formula    : y_val ~ conflict_w + conflict_w:Fed + logG + logP + dem + conflict_mean +      conflict_mean_Fed + logG_mean + logP_mean + dem_mean + year_f
+N=736 | Countries=57 | R2=0.1356 | Adj.R2=0.0937
+
+Term                                          Coef             SE            t            p
+-----------------------------------------------------------------------------------------------
+(Intercept)                               0.231524     (0.544232)        0.425      0.67067
+conflict_w                               -0.005306     (0.019160)       -0.277      0.78190
+logG                                      0.128148     (0.207070)        0.619      0.53621
+logP                                     -0.308277     (0.418746)       -0.736      0.46186
+dem                                       0.200153     (0.170954)        1.171      0.24208
+conflict_mean                             0.103195     (0.284468)        0.363      0.71689
+conflict_mean_Fed                        -0.857516     (0.522523)       -1.641      0.10122
+logG_mean                                -0.198877     (0.224700)       -0.885      0.37642
+logP_mean                                 0.330887     (0.425234)        0.778      0.43676
+dem_mean                                  0.161997     (0.292699)        0.553      0.58012
+conflict_w:Fed                            0.009283     (0.031319)        0.296      0.76702
+
+MODEL 3
+--------------------------------------------------------------------------------
+Control set: full_logG_dem | controls = logG, logP, dem
+Conflict   : fatalities_continuous (Fatalities intensity (continuous F))
+Outcome    : selfrule_institutional (Institutional centralisation (reverse-coded self-rule))
+Formula    : y_val ~ conflict_w + conflict_w:Fed + logG + logP + dem + conflict_mean +      conflict_mean_Fed + logG_mean + logP_mean + dem_mean + year_f
+N=2141 | Countries=88 | R2=0.6403 | Adj.R2=0.6345
+
+Term                                          Coef             SE            t            p
+-----------------------------------------------------------------------------------------------
+(Intercept)                           60.540577***     (5.597047)       10.817      0.00000
+conflict_w                                0.272113     (0.191856)        1.418      0.15625
+logG                                      0.231635     (1.054781)        0.220      0.82620
+logP                                      3.019652     (1.987263)        1.520      0.12879
+dem                                     -4.718849.     (2.748170)       -1.717      0.08611
+conflict_mean                          5.837531***     (1.411652)        4.135      0.00004
+conflict_mean_Fed                    -10.012347***     (1.717010)       -5.831      0.00000
+logG_mean                               -1.999739.     (1.048513)       -1.907      0.05663
+logP_mean                              -6.032902**     (1.939662)       -3.110      0.00189
+dem_mean                                  0.781832     (4.348169)        0.180      0.85732
+conflict_w:Fed                            0.300419     (0.435956)        0.689      0.49083
+
+MODEL 4
+--------------------------------------------------------------------------------
+Control set: full_logG_dem | controls = logG, logP, dem
+Conflict   : hostility_high_dummy (High hostility dummy (HL >= 4))
+Outcome    : selfrule_institutional (Institutional centralisation (reverse-coded self-rule))
+Formula    : y_val ~ conflict_w + conflict_w:Fed + logG + logP + dem + conflict_mean +      conflict_mean_Fed + logG_mean + logP_mean + dem_mean + year_f
+N=2141 | Countries=88 | R2=0.6626 | Adj.R2=0.6571
+
+Term                                          Coef             SE            t            p
+-----------------------------------------------------------------------------------------------
+(Intercept)                           55.215285***     (4.865015)       11.349      0.00000
+conflict_w                               0.350630.     (0.186001)        1.885      0.05955
+logG                                      0.186648     (1.060037)        0.176      0.86025
+logP                                      2.788851     (2.008446)        1.389      0.16511
+dem                                     -4.755230.     (2.725210)       -1.745      0.08115
+conflict_mean                             2.480412     (4.135675)        0.600      0.54873
+conflict_mean_Fed                    -23.022868***     (5.012185)       -4.593      0.00000
+logG_mean                               -1.868952.     (1.031333)       -1.812      0.07010
+logP_mean                              -5.538706**     (1.967576)       -2.815      0.00492
+dem_mean                                  1.787349     (4.213281)        0.424      0.67145
+conflict_w:Fed                            0.716335     (0.881300)        0.813      0.41642
+
+MODEL 5
+--------------------------------------------------------------------------------
+Control set: no_dem | controls = logG, logP
+Conflict   : fatalities_continuous (Fatalities intensity (continuous F))
+Outcome    : vfi_fiscal (Fiscal centralisation (VFI))
+Formula    : y_val ~ conflict_w + conflict_w:Fed + logG + logP + conflict_mean +      conflict_mean_Fed + logG_mean + logP_mean + year_f
+N=736 | Countries=57 | R2=0.0825 | Adj.R2=0.0407
+
+Term                                          Coef             SE            t            p
+-----------------------------------------------------------------------------------------------
+(Intercept)                               0.347046     (0.573394)        0.605      0.54521
+conflict_w                                0.007994     (0.018062)        0.443      0.65821
+logG                                      0.179811     (0.218579)        0.823      0.41099
+logP                                     -0.259167     (0.431645)       -0.600      0.54842
+conflict_mean                             0.106159     (0.161965)        0.655      0.51240
+conflict_mean_Fed                        -0.574992     (0.471726)       -1.219      0.22329
+logG_mean                                -0.218394     (0.234783)       -0.930      0.35259
+logP_mean                                 0.268937     (0.438001)        0.614      0.53941
+conflict_w:Fed                           -0.037197     (0.041760)       -0.891      0.37338
+
+MODEL 6
+--------------------------------------------------------------------------------
+Control set: no_dem | controls = logG, logP
+Conflict   : hostility_high_dummy (High hostility dummy (HL >= 4))
+Outcome    : vfi_fiscal (Fiscal centralisation (VFI))
+Formula    : y_val ~ conflict_w + conflict_w:Fed + logG + logP + conflict_mean +      conflict_mean_Fed + logG_mean + logP_mean + year_f
+N=736 | Countries=57 | R2=0.0979 | Adj.R2=0.0568
+
+Term                                          Coef             SE            t            p
+-----------------------------------------------------------------------------------------------
+(Intercept)                               0.224099     (0.537793)        0.417      0.67702
+conflict_w                               -0.012261     (0.020842)       -0.588      0.55652
+logG                                      0.220636     (0.213064)        1.036      0.30077
+logP                                     -0.209452     (0.440936)       -0.475      0.63492
+conflict_mean                             0.059204     (0.263587)        0.225      0.82235
+conflict_mean_Fed                        -0.751475     (0.526887)       -1.426      0.15424
+logG_mean                                -0.249353     (0.229292)       -1.087      0.27719
+logP_mean                                 0.224574     (0.446451)        0.503      0.61511
+conflict_w:Fed                            0.003261     (0.028283)        0.115      0.90824
+
+MODEL 7
+--------------------------------------------------------------------------------
+Control set: no_dem | controls = logG, logP
+Conflict   : fatalities_continuous (Fatalities intensity (continuous F))
+Outcome    : selfrule_institutional (Institutional centralisation (reverse-coded self-rule))
+Formula    : y_val ~ conflict_w + conflict_w:Fed + logG + logP + conflict_mean +      conflict_mean_Fed + logG_mean + logP_mean + year_f
+N=2191 | Countries=90 | R2=0.6409 | Adj.R2=0.6355
+
+Term                                          Coef             SE            t            p
+-----------------------------------------------------------------------------------------------
+(Intercept)                           61.368593***     (5.237624)       11.717      0.00000
+conflict_w                               0.397298.     (0.209722)        1.894      0.05831
+logG                                     -0.012412     (1.034089)       -0.012      0.99042
+logP                                     3.426877.     (1.886976)        1.816      0.06950
+conflict_mean                          6.085133***     (1.417994)        4.291      0.00002
+conflict_mean_Fed                    -10.708511***     (1.763379)       -6.073      0.00000
+logG_mean                               -2.258106*     (0.986576)       -2.289      0.02219
+logP_mean                             -6.363584***     (1.844770)       -3.450      0.00057
+conflict_w:Fed                            0.184332     (0.480600)        0.384      0.70135
+
+MODEL 8
+--------------------------------------------------------------------------------
+Control set: no_dem | controls = logG, logP
+Conflict   : hostility_high_dummy (High hostility dummy (HL >= 4))
+Outcome    : selfrule_institutional (Institutional centralisation (reverse-coded self-rule))
+Formula    : y_val ~ conflict_w + conflict_w:Fed + logG + logP + conflict_mean +      conflict_mean_Fed + logG_mean + logP_mean + year_f
+N=2191 | Countries=90 | R2=0.6654 | Adj.R2=0.6604
+
+Term                                          Coef             SE            t            p
+-----------------------------------------------------------------------------------------------
+(Intercept)                           55.545967***     (4.592667)       12.094      0.00000
+conflict_w                               0.412712*     (0.185125)        2.229      0.02589
+logG                                     -0.053683     (1.037590)       -0.052      0.95874
+logP                                     3.213893.     (1.913656)        1.679      0.09321
+conflict_mean                             2.438725     (4.241007)        0.575      0.56533
+conflict_mean_Fed                    -24.249410***     (4.631178)       -5.236      0.00000
+logG_mean                               -1.988004*     (0.986074)       -2.016      0.04392
+logP_mean                              -5.892991**     (1.879976)       -3.135      0.00174
+conflict_w:Fed                            0.653343     (0.948292)        0.689      0.49092
+
+MODEL 9
+--------------------------------------------------------------------------------
+Control set: no_logG | controls = logP, dem
+Conflict   : fatalities_continuous (Fatalities intensity (continuous F))
+Outcome    : vfi_fiscal (Fiscal centralisation (VFI))
+Formula    : y_val ~ conflict_w + conflict_w:Fed + logP + dem + conflict_mean +      conflict_mean_Fed + logP_mean + dem_mean + year_f
+N=736 | Countries=57 | R2=0.0546 | Adj.R2=0.0115
+
+Term                                          Coef             SE            t            p
+-----------------------------------------------------------------------------------------------
+(Intercept)                              -0.057087     (0.476455)       -0.120      0.90466
+conflict_w                                0.011303     (0.017247)        0.655      0.51247
+logP                                     -0.421254     (0.351680)       -1.198      0.23138
+dem                                       0.229515     (0.149079)        1.540      0.12412
+conflict_mean                             0.116030     (0.190973)        0.608      0.54367
+conflict_mean_Fed                       -0.944489*     (0.435488)       -2.169      0.03043
+logP_mean                                 0.430209     (0.357505)        1.203      0.22924
+dem_mean                                 -0.204896     (0.220932)       -0.927      0.35403
+conflict_w:Fed                            0.006263     (0.037071)        0.169      0.86589
+
+MODEL 10
+--------------------------------------------------------------------------------
+Control set: no_logG | controls = logP, dem
+Conflict   : hostility_high_dummy (High hostility dummy (HL >= 4))
+Outcome    : vfi_fiscal (Fiscal centralisation (VFI))
+Formula    : y_val ~ conflict_w + conflict_w:Fed + logP + dem + conflict_mean +      conflict_mean_Fed + logP_mean + dem_mean + year_f
+N=736 | Countries=57 | R2=0.0863 | Adj.R2=0.0447
+
+Term                                          Coef             SE            t            p
+-----------------------------------------------------------------------------------------------
+(Intercept)                              -0.145375     (0.425056)       -0.342      0.73244
+conflict_w                               -0.003935     (0.019524)       -0.202      0.84033
+logP                                     -0.339440     (0.350171)       -0.969      0.33270
+dem                                       0.239340     (0.148767)        1.609      0.10810
+conflict_mean                             0.126183     (0.265991)        0.474      0.63537
+conflict_mean_Fed                       -1.024259*     (0.492905)       -2.078      0.03807
+logP_mean                                 0.354929     (0.355941)        0.997      0.31903
+dem_mean                                 -0.141641     (0.226751)       -0.625      0.53240
+conflict_w:Fed                            0.007193     (0.031666)        0.227      0.82037
+
+MODEL 11
+--------------------------------------------------------------------------------
+Control set: no_logG | controls = logP, dem
+Conflict   : fatalities_continuous (Fatalities intensity (continuous F))
+Outcome    : selfrule_institutional (Institutional centralisation (reverse-coded self-rule))
+Formula    : y_val ~ conflict_w + conflict_w:Fed + logP + dem + conflict_mean +      conflict_mean_Fed + logP_mean + dem_mean + year_f
+N=2141 | Countries=88 | R2=0.6055 | Adj.R2=0.5995
+
+Term                                          Coef             SE            t            p
+-----------------------------------------------------------------------------------------------
+(Intercept)                           49.860055***     (4.371960)       11.405      0.00000
+conflict_w                                0.268224     (0.191982)        1.397      0.16252
+logP                                      2.805308     (1.858299)        1.510      0.13129
+dem                                     -4.755277.     (2.756456)       -1.725      0.08465
+conflict_mean                          4.842773***     (1.381885)        3.504      0.00047
+conflict_mean_Fed                     -7.632416***     (1.371437)       -5.565      0.00000
+logP_mean                              -5.815085**     (1.821128)       -3.193      0.00143
+dem_mean                                -7.337967*     (3.147491)       -2.331      0.01983
+conflict_w:Fed                            0.295726     (0.437524)        0.676      0.49917
+
+MODEL 12
+--------------------------------------------------------------------------------
+Control set: no_logG | controls = logP, dem
+Conflict   : hostility_high_dummy (High hostility dummy (HL >= 4))
+Outcome    : selfrule_institutional (Institutional centralisation (reverse-coded self-rule))
+Formula    : y_val ~ conflict_w + conflict_w:Fed + logP + dem + conflict_mean +      conflict_mean_Fed + logP_mean + dem_mean + year_f
+N=2141 | Countries=88 | R2=0.6295 | Adj.R2=0.6239
+
+Term                                          Coef             SE            t            p
+-----------------------------------------------------------------------------------------------
+(Intercept)                           45.235189***     (3.958038)       11.429      0.00000
+conflict_w                               0.351113.     (0.186099)        1.887      0.05934
+logP                                      2.586187     (1.888614)        1.369      0.17103
+dem                                     -4.797892.     (2.729460)       -1.758      0.07892
+conflict_mean                             2.636478     (3.894756)        0.677      0.49852
+conflict_mean_Fed                    -20.353164***     (5.907782)       -3.445      0.00058
+logP_mean                              -5.341081**     (1.843390)       -2.897      0.00380
+dem_mean                                -6.108429.     (3.138403)       -1.946      0.05175
+conflict_w:Fed                            0.725589     (0.870250)        0.834      0.40450
+
+MODEL 13
+--------------------------------------------------------------------------------
+Control set: no_logG_no_dem | controls = logP
+Conflict   : fatalities_continuous (Fatalities intensity (continuous F))
+Outcome    : vfi_fiscal (Fiscal centralisation (VFI))
+Formula    : y_val ~ conflict_w + conflict_w:Fed + logP + conflict_mean +      conflict_mean_Fed + logP_mean + year_f
+N=736 | Countries=57 | R2=0.0521 | Adj.R2=0.0118
+
+Term                                          Coef             SE            t            p
+-----------------------------------------------------------------------------------------------
+(Intercept)                              -0.035003     (0.474039)       -0.074      0.94116
+conflict_w                                0.011709     (0.017264)        0.678      0.49785
+logP                                     -0.395300     (0.344900)       -1.146      0.25213
+conflict_mean                             0.111493     (0.192995)        0.578      0.56365
+conflict_mean_Fed                       -0.900352*     (0.437150)       -2.060      0.03980
+logP_mean                                 0.403808     (0.351028)        1.150      0.25039
+conflict_w:Fed                           -0.008537     (0.040623)       -0.210      0.83361
+
+MODEL 14
+--------------------------------------------------------------------------------
+Control set: no_logG_no_dem | controls = logP
+Conflict   : hostility_high_dummy (High hostility dummy (HL >= 4))
+Outcome    : vfi_fiscal (Fiscal centralisation (VFI))
+Formula    : y_val ~ conflict_w + conflict_w:Fed + logP + conflict_mean +      conflict_mean_Fed + logP_mean + year_f
+N=736 | Countries=57 | R2=0.0787 | Adj.R2=0.0395
+
+Term                                          Coef             SE            t            p
+-----------------------------------------------------------------------------------------------
+(Intercept)                              -0.049552     (0.434987)       -0.114      0.90934
+conflict_w                               -0.008253     (0.020427)       -0.404      0.68633
+logP                                     -0.289422     (0.345810)       -0.837      0.40291
+conflict_mean                             0.092131     (0.265394)        0.347      0.72858
+conflict_mean_Fed                       -0.904954.     (0.479841)       -1.886      0.05971
+logP_mean                                 0.303189     (0.350944)        0.864      0.38792
+conflict_w:Fed                            0.009894     (0.029969)        0.330      0.74140
+
+MODEL 15
+--------------------------------------------------------------------------------
+Control set: no_logG_no_dem | controls = logP
+Conflict   : fatalities_continuous (Fatalities intensity (continuous F))
+Outcome    : selfrule_institutional (Institutional centralisation (reverse-coded self-rule))
+Formula    : y_val ~ conflict_w + conflict_w:Fed + logP + conflict_mean +      conflict_mean_Fed + logP_mean + year_f
+N=2191 | Countries=90 | R2=0.4918 | Adj.R2=0.4847
+
+Term                                          Coef             SE            t            p
+-----------------------------------------------------------------------------------------------
+(Intercept)                           36.263982***     (3.799830)        9.544      0.00000
+conflict_w                               0.404548.     (0.217761)        1.858      0.06334
+logP                                     2.904020.     (1.762338)        1.648      0.09953
+conflict_mean                            5.283740*     (2.082880)        2.537      0.01126
+conflict_mean_Fed                     -8.022178***     (2.230189)       -3.597      0.00033
+logP_mean                              -5.567711**     (1.759064)       -3.165      0.00157
+conflict_w:Fed                            0.166438     (0.480687)        0.346      0.72919
+
+MODEL 16
+--------------------------------------------------------------------------------
+Control set: no_logG_no_dem | controls = logP
+Conflict   : hostility_high_dummy (High hostility dummy (HL >= 4))
+Outcome    : selfrule_institutional (Institutional centralisation (reverse-coded self-rule))
+Formula    : y_val ~ conflict_w + conflict_w:Fed + logP + conflict_mean +      conflict_mean_Fed + logP_mean + year_f
+N=2191 | Countries=90 | R2=0.5414 | Adj.R2=0.5350
+
+Term                                          Coef             SE            t            p
+-----------------------------------------------------------------------------------------------
+(Intercept)                           31.897841***     (3.041176)       10.489      0.00000
+conflict_w                               0.421833*     (0.186181)        2.266      0.02357
+logP                                      2.758786     (1.806786)        1.527      0.12693
+conflict_mean                             3.210733     (4.726420)        0.679      0.49701
+conflict_mean_Fed                    -25.422856***     (7.586155)       -3.351      0.00082
+logP_mean                              -5.125808**     (1.803801)       -2.842      0.00453
+conflict_w:Fed                            0.660226     (0.934860)        0.706      0.48012
+
+Significance: *** p<0.001, ** p<0.01, * p<0.05, . p<0.10
+
+ESTIMATION COMPLETE.

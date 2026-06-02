@@ -60,6 +60,12 @@ vfi$ccode <- tolower(vfi$ccode)
 vfi$year <- as.integer(vfi$year)
 vfi <- vfi[, c("ccode", "year", "vfi")]
 
+democracy <- read.csv("clean_data/democracy_clean.csv", stringsAsFactors = FALSE)
+democracy$ccode <- tolower(democracy$ccode)
+democracy$year <- as.integer(democracy$year)
+democracy <- democracy[, c("ccode", "year", "v2x_polyarchy")]
+names(democracy)[names(democracy) == "v2x_polyarchy"] <- "dem"
+
 # Static federalism indicator used in models
 federal_countries <- c("aus", "aut", "bel", "can", "deu", "ind", "mex", "nga",
                        "pak", "che", "usa", "arg", "bra")
@@ -75,6 +81,7 @@ panel <- merge(panel, rai, by = c("ccode", "year"), all.x = TRUE)
 panel <- merge(panel, G, by = c("ccode", "year"), all.x = TRUE)
 panel <- merge(panel, P, by = c("ccode", "year"), all.x = TRUE)
 panel <- merge(panel, vfi, by = c("ccode", "year"), all.x = TRUE)
+panel <- merge(panel, democracy, by = c("ccode", "year"), all.x = TRUE)
 
 # Keep analysis period consistent with prior scripts
 panel <- panel[panel$year >= 1990 & panel$year <= 2014, ]

@@ -3,9 +3,9 @@
 #
 # Baseline CRE-Mundlak model:
 #   Y_it = b1 * Conflict_it + b2 * (Conflict_it x Fed_i) +
-#          g1 * logG_it + g2 * logP_it +
+#          g1 * logG_it + g2 * logP_it + g3 * dem_it +
 #          d1 * mean(Conflict_i) + d2 * (mean(Conflict_i) x Fed_i) +
-#          d3 * mean(logG_i) + d4 * mean(logP_i) + l_t + e_it
+#          d3 * mean(logG_i) + d4 * mean(logP_i) + d5 * mean(dem_i) + l_t + e_it
 # where:
 #   - Y_it is a centralisation outcome
 #   - Conflict_it is switchable across conflict indicators
@@ -66,7 +66,7 @@ MODEL_CONFIG <- list(
     list(conflict = "hostility_high_dummy", centralisation = "selfrule_institutional")
   ),
 
-  controls = c("logG", "logP"),
+  controls = c("logG", "logP", "dem"),
   fixed_effects = c("year_f"),
   federal_indicator = "Fed"
 )

@@ -1,8 +1,6 @@
 ================================================================================
-HAUSMAN-MUNDLAK DIAGNOSTIC RESULTS
-Test: Joint Wald test of Mundlak means = 0
-H0: conflict_mean = conflict_mean_Fed = all control means = 0
-SE: Country-clustered (vcovCL)
+RESIDUAL DEPENDENCE DIAGNOSTICS (CRE-MUNDLAK 2x2)
+Tests: Pesaran CD (cross-sectional dependence), Breusch-Godfrey pbgtest (serial correlation)
 ================================================================================
 
 MODEL 1
@@ -10,35 +8,49 @@ MODEL 1
 Conflict: fatalities_continuous (Fatalities intensity (continuous F))
 Outcome : vfi_fiscal (Fiscal centralisation (VFI))
 Formula : y_val ~ conflict_w + conflict_w:Fed + logG + logP + dem + conflict_mean +      conflict_mean_Fed + logG_mean + logP_mean + dem_mean + year_f
-N=736 | Countries=57
-Wald ChiSq=18.0975 | df=5 | p=0.00283
-Decision at 5%: Reject H0 (correlated effects likely present)
+N=736 | Countries=57 | Years=25
+
+Pesaran CD (H0: cross-sectional independence)
+  Statistic = 6.9308 | p = 0.00000 | Reject H0 at 5%
+Breusch-Godfrey pbgtest (H0: no serial correlation)
+  Statistic = 533.2162 | p = 0.00000 | Reject H0 at 5%
 
 MODEL 2
 --------------------------------------------------------------------------------
 Conflict: hostility_high_dummy (High hostility dummy (HL >= 4))
 Outcome : vfi_fiscal (Fiscal centralisation (VFI))
 Formula : y_val ~ conflict_w + conflict_w:Fed + logG + logP + dem + conflict_mean +      conflict_mean_Fed + logG_mean + logP_mean + dem_mean + year_f
-N=736 | Countries=57
-Wald ChiSq=17.2432 | df=5 | p=0.00406
-Decision at 5%: Reject H0 (correlated effects likely present)
+N=736 | Countries=57 | Years=25
+
+Pesaran CD (H0: cross-sectional independence)
+  Statistic = 7.1042 | p = 0.00000 | Reject H0 at 5%
+Breusch-Godfrey pbgtest (H0: no serial correlation)
+  Statistic = 529.1610 | p = 0.00000 | Reject H0 at 5%
 
 MODEL 3
 --------------------------------------------------------------------------------
 Conflict: fatalities_continuous (Fatalities intensity (continuous F))
 Outcome : selfrule_institutional (Institutional centralisation (reverse-coded self-rule))
 Formula : y_val ~ conflict_w + conflict_w:Fed + logG + logP + dem + conflict_mean +      conflict_mean_Fed + logG_mean + logP_mean + dem_mean + year_f
-N=2141 | Countries=88
-Wald ChiSq=47.7077 | df=5 | p=0.00000
-Decision at 5%: Reject H0 (correlated effects likely present)
+N=2141 | Countries=88 | Years=25
+
+Pesaran CD (H0: cross-sectional independence)
+  Statistic = 28.3130 | p = 0.00000 | Reject H0 at 5%
+Breusch-Godfrey pbgtest (H0: no serial correlation)
+  Statistic = 1842.9233 | p = 0.00000 | Reject H0 at 5%
 
 MODEL 4
 --------------------------------------------------------------------------------
 Conflict: hostility_high_dummy (High hostility dummy (HL >= 4))
 Outcome : selfrule_institutional (Institutional centralisation (reverse-coded self-rule))
 Formula : y_val ~ conflict_w + conflict_w:Fed + logG + logP + dem + conflict_mean +      conflict_mean_Fed + logG_mean + logP_mean + dem_mean + year_f
-N=2141 | Countries=88
-Wald ChiSq=34.4870 | df=5 | p=0.00000
-Decision at 5%: Reject H0 (correlated effects likely present)
+N=2141 | Countries=88 | Years=25
+
+Pesaran CD (H0: cross-sectional independence)
+  Statistic = 28.7132 | p = 0.00000 | Reject H0 at 5%
+Breusch-Godfrey pbgtest (H0: no serial correlation)
+  Statistic = 1820.2925 | p = 0.00000 | Reject H0 at 5%
+
+Interpretation note: rejection in either test supports robust SE choices such as DK.
 
 DIAGNOSTICS COMPLETE.

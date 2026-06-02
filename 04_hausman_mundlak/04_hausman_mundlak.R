@@ -18,6 +18,16 @@ if (!file.exists(panel_path)) {
 panel <- read.csv(panel_path, stringsAsFactors = FALSE)
 panel$year_f <- as.factor(panel$year)
 
+add_control_means <- function(dat, controls) {
+  mean_vars <- character(0)
+  for (ctrl in controls) {
+    mean_col <- paste0(ctrl, "_mean")
+    dat[[mean_col]] <- ave(dat[[ctrl]], dat$ccode, FUN = function(x) mean(x, na.rm = TRUE))
+    mean_vars <- c(mean_vars, mean_col)
+  }
+  list(dat = dat, mean_vars = mean_vars)
+}
+
 fit_and_test_mundlak <- function(data, conflict_key, centralisation_key, cfg = MODEL_CONFIG) {
   conflict_expr <- get_conflict_term_by_key(conflict_key, cfg)
   outcome_expr <- get_outcome_term_by_key(centralisation_key, cfg)
@@ -37,24 +47,33 @@ fit_and_test_mundlak <- function(data, conflict_key, centralisation_key, cfg = M
   dat$conflict_w <- with(dat, eval(parse(text = conflict_expr)))
 
   dat$conflict_mean <- ave(dat$conflict_w, dat$ccode, FUN = function(x) mean(x, na.rm = TRUE))
-  dat$logG_mean <- ave(dat$logG, dat$ccode, FUN = function(x) mean(x, na.rm = TRUE))
-  dat$logP_mean <- ave(dat$logP, dat$ccode, FUN = function(x) mean(x, na.rm = TRUE))
   dat$conflict_mean_Fed <- dat$conflict_mean * dat[[fed]]
 
-  f <- as.formula(
-    paste(
-      "y_val ~ conflict_w + conflict_w:", fed,
-      "+ logG + logP + conflict_mean + conflict_mean_Fed + logG_mean + logP_mean + year_f",
-      sep = ""
-    )
+  mean_build <- add_control_means(dat, cfg$controls)
+  dat <- mean_build$dat
+  control_mean_terms <- mean_build$mean_vars
+
+  rhs <- c(
+    "conflict_w",
+    sprintf("conflict_w:%s", fed),
+    cfg$controls,
+    "conflict_mean",
+    "conflict_mean_Fed",
+    control_mean_terms,
+    "year_f"
   )
+
+  f <- as.formula(sprintf("y_val ~ %s", paste(rhs, collapse = " + ")))
 
   m <- lm(f, data = dat)
   V <- vcovCL(m, cluster = dat$ccode)
 
+  mundlak_terms <- c("conflict_mean", "conflict_mean_Fed", control_mean_terms)
+  test_restrictions <- paste0(mundlak_terms, " = 0")
+
   test <- linearHypothesis(
     m,
-    c("conflict_mean = 0", "conflict_mean_Fed = 0", "logG_mean = 0", "logP_mean = 0"),
+    test_restrictions,
     vcov. = V,
     test = "Chisq"
   )
@@ -86,7 +105,7 @@ sink(out_file)
 cat("================================================================================\n")
 cat("HAUSMAN-MUNDLAK DIAGNOSTIC RESULTS\n")
 cat("Test: Joint Wald test of Mundlak means = 0\n")
-cat("H0: conflict_mean = conflict_mean_Fed = logG_mean = logP_mean = 0\n")
+cat("H0: conflict_mean = conflict_mean_Fed = all control means = 0\n")
 cat("SE: Country-clustered (vcovCL)\n")
 cat("================================================================================\n\n")
 
