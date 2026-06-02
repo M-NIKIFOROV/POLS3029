@@ -1,5 +1,5 @@
 # 02_regression/02_regression.R
-# Run 2x2 baseline CRE model matrix from model_config.R
+# Run 2x2 baseline CRE-Mundlak model matrix from model_config.R
 # Output: 02_regression/02_output/02_regression.txt
 
 setwd("c:/Users/maxim/OneDrive/Documents/University - Year 3/POLS3029/paper/POLS3029")
@@ -19,9 +19,6 @@ if (!file.exists(panel_path)) {
 }
 
 panel <- read.csv(panel_path, stringsAsFactors = FALSE)
-
-# Prepare FE factors
-panel$ccode_f <- as.factor(panel$ccode)
 panel$year_f <- as.factor(panel$year)
 
 # ----------------------------------------------------------------------------
@@ -38,15 +35,34 @@ sig_mark <- function(p) {
 }
 
 fit_one_model <- function(data, conflict_key, centralisation_key, cfg = MODEL_CONFIG) {
-  f <- build_formula_by_keys(conflict_key, centralisation_key, cfg)
+  conflict_expr <- get_conflict_term_by_key(conflict_key, cfg)
+  outcome_expr <- get_outcome_term_by_key(centralisation_key, cfg)
+  conflict_src <- cfg$conflict[[conflict_key]]$source_variable
+  outcome_src <- cfg$centralisation[[centralisation_key]]$source_variable
 
-  vars_needed <- unique(all.vars(f))
+  vars_needed <- c(conflict_src, outcome_src, cfg$controls, cfg$federal_indicator, "year_f", "ccode")
   vars_needed <- vars_needed[vars_needed %in% names(data)]
 
   dat <- data[complete.cases(data[, vars_needed, drop = FALSE]), ]
   if (nrow(dat) == 0) {
     stop(sprintf("No complete cases for model %s x %s", conflict_key, centralisation_key))
   }
+
+  dat$y_val <- with(dat, eval(parse(text = outcome_expr)))
+  dat$conflict_w <- with(dat, eval(parse(text = conflict_expr)))
+
+  dat$conflict_mean <- ave(dat$conflict_w, dat$ccode, FUN = function(x) mean(x, na.rm = TRUE))
+  dat$logG_mean <- ave(dat$logG, dat$ccode, FUN = function(x) mean(x, na.rm = TRUE))
+  dat$logP_mean <- ave(dat$logP, dat$ccode, FUN = function(x) mean(x, na.rm = TRUE))
+  dat$conflict_mean_Fed <- dat$conflict_mean * dat[[cfg$federal_indicator]]
+
+  f <- as.formula(
+    paste(
+      "y_val ~ conflict_w + conflict_w:", cfg$federal_indicator,
+      "+ logG + logP + conflict_mean + conflict_mean_Fed + logG_mean + logP_mean + year_f",
+      sep = ""
+    )
+  )
 
   m <- lm(f, data = dat)
   vc <- vcovCL(m, cluster = dat$ccode)
@@ -57,8 +73,8 @@ fit_one_model <- function(data, conflict_key, centralisation_key, cfg = MODEL_CO
   mm_terms <- colnames(model.matrix(m))
   omitted_terms <- setdiff(mm_terms, rownames(ct))
 
-  # Keep full CRE coefficients but drop FE dummies for readability
-  keep <- !grepl("^ccode_f|^year_f", rownames(ct))
+  # Keep CRE and Mundlak coefficients but drop year FE dummies for readability
+  keep <- !grepl("^year_f", rownames(ct))
   ct <- ct[keep, , drop = FALSE]
 
   coefs <- data.frame(
@@ -112,12 +128,12 @@ out_file <- "02_regression/02_output/02_regression.txt"
 sink(out_file)
 
 cat("================================================================================\n")
-cat("CRE 2x2 MODEL MATRIX RESULTS\n")
+cat("CRE-MUNDLAK 2x2 MODEL MATRIX RESULTS\n")
 cat(sprintf("Conflict indicators: %s\n", paste(unique(vapply(MODEL_CONFIG$model_matrix, function(x) x$conflict, character(1))), collapse = ", ")))
 cat(sprintf("Centralisation outcomes: %s\n", paste(unique(vapply(MODEL_CONFIG$model_matrix, function(x) x$centralisation, character(1))), collapse = ", ")))
-cat("Specification: Y_it = Conflict_it + Conflict_it x Fed_i + logG_it + logP_it + country FE + year FE\n")
+cat("Specification: Y_it = Conflict_it + Conflict_it x Fed_i + logG_it + logP_it + country means (Mundlak) + year FE\n")
 cat("SE: Country-clustered (vcovCL)\n")
-cat("Reporting: country/year FE coefficients omitted for readability\n")
+cat("Reporting: year FE coefficients omitted for readability\n")
 cat("================================================================================\n\n")
 
 model_names <- names(results)
@@ -144,7 +160,7 @@ for (i in seq_along(model_names)) {
     cat(sprintf("%-35s %14s %14s %12s %12s\n", rr$term, est, se, tval, pval))
   }
 
-  dropped_non_fe <- r$omitted_terms[!grepl("^ccode_f|^year_f", r$omitted_terms)]
+  dropped_non_fe <- r$omitted_terms[!grepl("^year_f", r$omitted_terms)]
   if (length(dropped_non_fe) > 0) {
     cat("\nDropped (not estimable in-sample): ", paste(dropped_non_fe, collapse = ", "), "\n", sep = "")
   }

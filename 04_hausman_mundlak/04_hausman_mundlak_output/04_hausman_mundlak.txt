@@ -1,0 +1,44 @@
+================================================================================
+HAUSMAN-MUNDLAK DIAGNOSTIC RESULTS
+Test: Joint Wald test of Mundlak means = 0
+H0: conflict_mean = conflict_mean_Fed = logG_mean = logP_mean = 0
+SE: Country-clustered (vcovCL)
+================================================================================
+
+MODEL 1
+--------------------------------------------------------------------------------
+Conflict: fatalities_continuous (Fatalities intensity (continuous F))
+Outcome : vfi_fiscal (Fiscal centralisation (VFI))
+Formula : y_val ~ conflict_w + conflict_w:Fed + logG + logP + conflict_mean +      conflict_mean_Fed + logG_mean + logP_mean + year_f
+N=736 | Countries=57
+Wald ChiSq=16.9934 | df=4 | p=0.00194
+Decision at 5%: Reject H0 (correlated effects likely present)
+
+MODEL 2
+--------------------------------------------------------------------------------
+Conflict: hostility_high_dummy (High hostility dummy (HL >= 4))
+Outcome : vfi_fiscal (Fiscal centralisation (VFI))
+Formula : y_val ~ conflict_w + conflict_w:Fed + logG + logP + conflict_mean +      conflict_mean_Fed + logG_mean + logP_mean + year_f
+N=736 | Countries=57
+Wald ChiSq=17.2599 | df=4 | p=0.00172
+Decision at 5%: Reject H0 (correlated effects likely present)
+
+MODEL 3
+--------------------------------------------------------------------------------
+Conflict: fatalities_continuous (Fatalities intensity (continuous F))
+Outcome : selfrule_institutional (Institutional centralisation (reverse-coded self-rule))
+Formula : y_val ~ conflict_w + conflict_w:Fed + logG + logP + conflict_mean +      conflict_mean_Fed + logG_mean + logP_mean + year_f
+N=2191 | Countries=90
+Wald ChiSq=53.8708 | df=4 | p=0.00000
+Decision at 5%: Reject H0 (correlated effects likely present)
+
+MODEL 4
+--------------------------------------------------------------------------------
+Conflict: hostility_high_dummy (High hostility dummy (HL >= 4))
+Outcome : selfrule_institutional (Institutional centralisation (reverse-coded self-rule))
+Formula : y_val ~ conflict_w + conflict_w:Fed + logG + logP + conflict_mean +      conflict_mean_Fed + logG_mean + logP_mean + year_f
+N=2191 | Countries=90
+Wald ChiSq=47.9521 | df=4 | p=0.00000
+Decision at 5%: Reject H0 (correlated effects likely present)
+
+DIAGNOSTICS COMPLETE.

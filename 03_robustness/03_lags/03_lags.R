@@ -35,8 +35,6 @@ for (src in conflict_sources) {
   }
 }
 
-# Prepare FE factors
-panel$ccode_f <- as.factor(panel$ccode)
 panel$year_f <- as.factor(panel$year)
 
 # ----------------------------------------------------------------------------
@@ -59,32 +57,36 @@ build_lagged_conflict_term <- function(conflict_key, lag_k, cfg = MODEL_CONFIG) 
   gsub(sprintf("\\b%s\\b", src), lagged_src, spec$transform)
 }
 
-build_lagged_formula_by_keys <- function(conflict_key, centralisation_key, lag_k, cfg = MODEL_CONFIG) {
-  conflict_term <- build_lagged_conflict_term(conflict_key, lag_k, cfg)
-  outcome_term <- get_outcome_term_by_key(centralisation_key, cfg)
+fit_one_lag_model <- function(data, conflict_key, centralisation_key, lag_k, cfg = MODEL_CONFIG) {
+  conflict_expr <- build_lagged_conflict_term(conflict_key, lag_k, cfg)
+  outcome_expr <- get_outcome_term_by_key(centralisation_key, cfg)
+  conflict_src <- cfg$conflict[[conflict_key]]$source_variable
+  outcome_src <- cfg$centralisation[[centralisation_key]]$source_variable
   fed <- cfg$federal_indicator
 
-  rhs <- c(
-    conflict_term,
-    sprintf("(%s):%s", conflict_term, fed),
-    cfg$controls,
-    cfg$fixed_effects
-  )
-
-  formula_txt <- sprintf("%s ~ %s", outcome_term, paste(rhs, collapse = " + "))
-  as.formula(formula_txt)
-}
-
-fit_one_lag_model <- function(data, conflict_key, centralisation_key, lag_k, cfg = MODEL_CONFIG) {
-  f <- build_lagged_formula_by_keys(conflict_key, centralisation_key, lag_k, cfg)
-
-  vars_needed <- unique(all.vars(f))
+  vars_needed <- c(sprintf("%s_l%d", conflict_src, lag_k), outcome_src, cfg$controls, fed, "year_f", "ccode")
   vars_needed <- vars_needed[vars_needed %in% names(data)]
 
   dat <- data[complete.cases(data[, vars_needed, drop = FALSE]), ]
   if (nrow(dat) == 0) {
     stop(sprintf("No complete cases for lag %d model %s x %s", lag_k, conflict_key, centralisation_key))
   }
+
+  dat$y_val <- with(dat, eval(parse(text = outcome_expr)))
+  dat$conflict_w <- with(dat, eval(parse(text = conflict_expr)))
+
+  dat$conflict_mean <- ave(dat$conflict_w, dat$ccode, FUN = function(x) mean(x, na.rm = TRUE))
+  dat$logG_mean <- ave(dat$logG, dat$ccode, FUN = function(x) mean(x, na.rm = TRUE))
+  dat$logP_mean <- ave(dat$logP, dat$ccode, FUN = function(x) mean(x, na.rm = TRUE))
+  dat$conflict_mean_Fed <- dat$conflict_mean * dat[[fed]]
+
+  f <- as.formula(
+    paste(
+      "y_val ~ conflict_w + conflict_w:", fed,
+      "+ logG + logP + conflict_mean + conflict_mean_Fed + logG_mean + logP_mean + year_f",
+      sep = ""
+    )
+  )
 
   m <- lm(f, data = dat)
   vc <- vcovCL(m, cluster = dat$ccode)
@@ -93,7 +95,7 @@ fit_one_lag_model <- function(data, conflict_key, centralisation_key, lag_k, cfg
   mm_terms <- colnames(model.matrix(m))
   omitted_terms <- setdiff(mm_terms, rownames(ct))
 
-  keep <- !grepl("^ccode_f|^year_f", rownames(ct))
+  keep <- !grepl("^year_f", rownames(ct))
   ct <- ct[keep, , drop = FALSE]
 
   coefs <- data.frame(
@@ -151,13 +153,13 @@ out_file <- "03_robustness/03_lags/03_lags_output/03_lags.txt"
 sink(out_file)
 
 cat("================================================================================\n")
-cat("LAG ROBUSTNESS MODEL RESULTS\n")
+cat("LAG ROBUSTNESS CRE-MUNDLAK MODEL RESULTS\n")
 cat(sprintf("Conflict indicators: %s\n", paste(unique(vapply(MODEL_CONFIG$model_matrix, function(x) x$conflict, character(1))), collapse = ", ")))
 cat(sprintf("Centralisation outcomes: %s\n", paste(unique(vapply(MODEL_CONFIG$model_matrix, function(x) x$centralisation, character(1))), collapse = ", ")))
 cat("Lags estimated: 1, 2, 3 years\n")
-cat("Specification: Y_it = Conflict_i,t-k + Conflict_i,t-k x Fed_i + logG_it + logP_it + country FE + year FE\n")
+cat("Specification: Y_it = Conflict_i,t-k + Conflict_i,t-k x Fed_i + logG_it + logP_it + country means (Mundlak) + year FE\n")
 cat("SE: Country-clustered (vcovCL)\n")
-cat("Reporting: country/year FE coefficients omitted for readability\n")
+cat("Reporting: year FE coefficients omitted for readability\n")
 cat("================================================================================\n\n")
 
 model_names <- names(results)
@@ -185,7 +187,7 @@ for (i in seq_along(model_names)) {
     cat(sprintf("%-35s %14s %14s %12s %12s\n", rr$term, est, se, tval, pval))
   }
 
-  dropped_non_fe <- r$omitted_terms[!grepl("^ccode_f|^year_f", r$omitted_terms)]
+  dropped_non_fe <- r$omitted_terms[!grepl("^year_f", r$omitted_terms)]
   if (length(dropped_non_fe) > 0) {
     cat("\nDropped (not estimable in-sample): ", paste(dropped_non_fe, collapse = ", "), "\n", sep = "")
   }
