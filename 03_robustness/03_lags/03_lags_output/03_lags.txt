@@ -1,0 +1,205 @@
+================================================================================
+LAG ROBUSTNESS MODEL RESULTS
+Conflict indicators: fatalities_continuous, hostility_high_dummy
+Centralisation outcomes: vfi_fiscal, selfrule_institutional
+Lags estimated: 1, 2, 3 years
+Specification: Y_it = Conflict_i,t-k + Conflict_i,t-k x Fed_i + logG_it + logP_it + country FE + year FE
+SE: Country-clustered (vcovCL)
+Reporting: country/year FE coefficients omitted for readability
+================================================================================
+
+MODEL 1
+--------------------------------------------------------------------------------
+Lag     : 1 year(s)
+Conflict: fatalities_continuous (Fatalities intensity (continuous F))
+Outcome : vfi_fiscal (Fiscal centralisation (VFI))
+Formula : vfi ~ F_l1 + (F_l1):Fed + logG + logP + ccode_f + year_f
+N=733 | Countries=57 | R2=0.8473 | Adj.R2=0.8277
+
+Term                                          Coef             SE            t            p
+-----------------------------------------------------------------------------------------------
+(Intercept)                               3.923675     (5.462431)        0.718      0.47283
+F_l1                                     -0.003260     (0.013411)       -0.243      0.80800
+logG                                      0.059473     (0.146443)        0.406      0.68479
+logP                                     -0.250913     (0.283136)       -0.886      0.37584
+F_l1:Fed                                 -0.005931     (0.023844)       -0.249      0.80362
+
+MODEL 2
+--------------------------------------------------------------------------------
+Lag     : 1 year(s)
+Conflict: hostility_high_dummy (High hostility dummy (HL >= 4))
+Outcome : vfi_fiscal (Fiscal centralisation (VFI))
+Formula : vfi ~ as.integer(HL_l1 >= 4) + (as.integer(HL_l1 >= 4)):Fed +      logG + logP + ccode_f + year_f
+N=733 | Countries=57 | R2=0.8473 | Adj.R2=0.8278
+
+Term                                          Coef             SE            t            p
+-----------------------------------------------------------------------------------------------
+(Intercept)                               3.960750     (5.509674)        0.719      0.47248
+as.integer(HL_l1 >= 4)                   -0.009326     (0.020813)       -0.448      0.65426
+logG                                      0.061138     (0.146150)        0.418      0.67585
+logP                                     -0.253126     (0.286395)       -0.884      0.37711
+as.integer(HL_l1 >= 4):Fed               -0.001570     (0.023885)       -0.066      0.94762
+
+MODEL 3
+--------------------------------------------------------------------------------
+Lag     : 1 year(s)
+Conflict: fatalities_continuous (Fatalities intensity (continuous F))
+Outcome : selfrule_institutional (Institutional centralisation (reverse-coded self-rule))
+Formula : -SELF ~ F_l1 + (F_l1):Fed + logG + logP + ccode_f + year_f
+N=2116 | Countries=90 | R2=0.9475 | Adj.R2=0.9444
+
+Term                                          Coef             SE            t            p
+-----------------------------------------------------------------------------------------------
+(Intercept)                             -32.558645    (27.306415)       -1.192      0.23327
+F_l1                                      0.063176     (0.195765)        0.323      0.74694
+logG                                     -0.543875     (0.780506)       -0.697      0.48599
+logP                                      2.469678     (1.709395)        1.445      0.14868
+F_l1:Fed                                  0.329362     (0.640816)        0.514      0.60733
+
+MODEL 4
+--------------------------------------------------------------------------------
+Lag     : 1 year(s)
+Conflict: hostility_high_dummy (High hostility dummy (HL >= 4))
+Outcome : selfrule_institutional (Institutional centralisation (reverse-coded self-rule))
+Formula : -SELF ~ as.integer(HL_l1 >= 4) + (as.integer(HL_l1 >= 4)):Fed +      logG + logP + ccode_f + year_f
+N=2116 | Countries=90 | R2=0.9477 | Adj.R2=0.9447
+
+Term                                          Coef             SE            t            p
+-----------------------------------------------------------------------------------------------
+(Intercept)                             -29.645391    (27.496996)       -1.078      0.28110
+as.integer(HL_l1 >= 4)                   0.495406*     (0.213177)        2.324      0.02023
+logG                                     -0.591900     (0.775494)       -0.763      0.44540
+logP                                      2.290409     (1.737105)        1.319      0.18748
+as.integer(HL_l1 >= 4):Fed                0.301675     (0.754203)        0.400      0.68921
+
+MODEL 5
+--------------------------------------------------------------------------------
+Lag     : 2 year(s)
+Conflict: fatalities_continuous (Fatalities intensity (continuous F))
+Outcome : vfi_fiscal (Fiscal centralisation (VFI))
+Formula : vfi ~ F_l2 + (F_l2):Fed + logG + logP + ccode_f + year_f
+N=729 | Countries=57 | R2=0.8473 | Adj.R2=0.8279
+
+Term                                          Coef             SE            t            p
+-----------------------------------------------------------------------------------------------
+(Intercept)                               3.929472     (5.474683)        0.718      0.47317
+F_l2                                     -0.004633     (0.016920)       -0.274      0.78429
+logG                                      0.060934     (0.148106)        0.411      0.68090
+logP                                     -0.250098     (0.284102)       -0.880      0.37902
+F_l2:Fed                                 -0.013412     (0.025329)       -0.530      0.59662
+
+MODEL 6
+--------------------------------------------------------------------------------
+Lag     : 2 year(s)
+Conflict: hostility_high_dummy (High hostility dummy (HL >= 4))
+Outcome : vfi_fiscal (Fiscal centralisation (VFI))
+Formula : vfi ~ as.integer(HL_l2 >= 4) + (as.integer(HL_l2 >= 4)):Fed +      logG + logP + ccode_f + year_f
+N=729 | Countries=57 | R2=0.8478 | Adj.R2=0.8284
+
+Term                                          Coef             SE            t            p
+-----------------------------------------------------------------------------------------------
+(Intercept)                               4.064594     (5.543395)        0.733      0.46368
+as.integer(HL_l2 >= 4)                   -0.026688     (0.017436)       -1.531      0.12637
+logG                                      0.062216     (0.146621)        0.424      0.67146
+logP                                     -0.257015     (0.288989)       -0.889      0.37414
+as.integer(HL_l2 >= 4):Fed                0.030146     (0.021985)        1.371      0.17079
+
+MODEL 7
+--------------------------------------------------------------------------------
+Lag     : 2 year(s)
+Conflict: fatalities_continuous (Fatalities intensity (continuous F))
+Outcome : selfrule_institutional (Institutional centralisation (reverse-coded self-rule))
+Formula : -SELF ~ F_l2 + (F_l2):Fed + logG + logP + ccode_f + year_f
+N=2036 | Countries=90 | R2=0.9510 | Adj.R2=0.9480
+
+Term                                          Coef             SE            t            p
+-----------------------------------------------------------------------------------------------
+(Intercept)                             -28.046193    (28.027938)       -1.001      0.31712
+F_l2                                     -0.191339     (0.232675)       -0.822      0.41098
+logG                                     -0.717586     (0.762603)       -0.941      0.34684
+logP                                      2.252081     (1.750817)        1.286      0.19849
+F_l2:Fed                                  0.689399     (0.627469)        1.099      0.27204
+
+MODEL 8
+--------------------------------------------------------------------------------
+Lag     : 2 year(s)
+Conflict: hostility_high_dummy (High hostility dummy (HL >= 4))
+Outcome : selfrule_institutional (Institutional centralisation (reverse-coded self-rule))
+Formula : -SELF ~ as.integer(HL_l2 >= 4) + (as.integer(HL_l2 >= 4)):Fed +      logG + logP + ccode_f + year_f
+N=2036 | Countries=90 | R2=0.9507 | Adj.R2=0.9477
+
+Term                                          Coef             SE            t            p
+-----------------------------------------------------------------------------------------------
+(Intercept)                             -24.327689    (28.922512)       -0.841      0.40038
+as.integer(HL_l2 >= 4)                    0.284973     (0.209169)        1.362      0.17323
+logG                                     -0.734008     (0.766278)       -0.958      0.33824
+logP                                      2.002669     (1.825307)        1.097      0.27271
+as.integer(HL_l2 >= 4):Fed                0.163909     (0.536509)        0.306      0.76001
+
+MODEL 9
+--------------------------------------------------------------------------------
+Lag     : 3 year(s)
+Conflict: fatalities_continuous (Fatalities intensity (continuous F))
+Outcome : vfi_fiscal (Fiscal centralisation (VFI))
+Formula : vfi ~ F_l3 + (F_l3):Fed + logG + logP + ccode_f + year_f
+N=724 | Countries=57 | R2=0.8469 | Adj.R2=0.8276
+
+Term                                          Coef             SE            t            p
+-----------------------------------------------------------------------------------------------
+(Intercept)                               4.102745     (5.715973)        0.718      0.47316
+F_l3                                     -0.008591     (0.015469)       -0.555      0.57883
+logG                                      0.061639     (0.150145)        0.411      0.68156
+logP                                     -0.257931     (0.295132)       -0.874      0.38247
+F_l3:Fed                                -0.043548.     (0.024329)       -1.790      0.07393
+
+MODEL 10
+--------------------------------------------------------------------------------
+Lag     : 3 year(s)
+Conflict: hostility_high_dummy (High hostility dummy (HL >= 4))
+Outcome : vfi_fiscal (Fiscal centralisation (VFI))
+Formula : vfi ~ as.integer(HL_l3 >= 4) + (as.integer(HL_l3 >= 4)):Fed +      logG + logP + ccode_f + year_f
+N=724 | Countries=57 | R2=0.8471 | Adj.R2=0.8278
+
+Term                                          Coef             SE            t            p
+-----------------------------------------------------------------------------------------------
+(Intercept)                               4.132857     (5.740648)        0.720      0.47183
+as.integer(HL_l3 >= 4)                   -0.020988     (0.019123)       -1.098      0.27282
+logG                                      0.057278     (0.149168)        0.384      0.70112
+logP                                     -0.257328     (0.297385)       -0.865      0.38720
+as.integer(HL_l3 >= 4):Fed                0.032152     (0.022792)        1.411      0.15882
+
+MODEL 11
+--------------------------------------------------------------------------------
+Lag     : 3 year(s)
+Conflict: fatalities_continuous (Fatalities intensity (continuous F))
+Outcome : selfrule_institutional (Institutional centralisation (reverse-coded self-rule))
+Formula : -SELF ~ F_l3 + (F_l3):Fed + logG + logP + ccode_f + year_f
+N=1952 | Countries=90 | R2=0.9543 | Adj.R2=0.9515
+
+Term                                          Coef             SE            t            p
+-----------------------------------------------------------------------------------------------
+(Intercept)                             -23.003880    (29.393393)       -0.783      0.43395
+F_l3                                     -0.340793     (0.299657)       -1.137      0.25557
+logG                                     -0.867933     (0.742667)       -1.169      0.24269
+logP                                      1.981921     (1.852126)        1.070      0.28472
+F_l3:Fed                                  0.816303     (0.553140)        1.476      0.14018
+
+MODEL 12
+--------------------------------------------------------------------------------
+Lag     : 3 year(s)
+Conflict: hostility_high_dummy (High hostility dummy (HL >= 4))
+Outcome : selfrule_institutional (Institutional centralisation (reverse-coded self-rule))
+Formula : -SELF ~ as.integer(HL_l3 >= 4) + (as.integer(HL_l3 >= 4)):Fed +      logG + logP + ccode_f + year_f
+N=1952 | Countries=90 | R2=0.9538 | Adj.R2=0.9510
+
+Term                                          Coef             SE            t            p
+-----------------------------------------------------------------------------------------------
+(Intercept)                             -19.281534    (30.613446)       -0.630      0.52888
+as.integer(HL_l3 >= 4)                    0.119572     (0.214068)        0.559      0.57652
+logG                                     -0.853712     (0.752196)       -1.135      0.25654
+logP                                      1.717234     (1.946171)        0.882      0.37769
+as.integer(HL_l3 >= 4):Fed                0.035385     (0.351769)        0.101      0.91988
+
+Significance: *** p<0.001, ** p<0.01, * p<0.05, . p<0.10
+
+ESTIMATION COMPLETE.
